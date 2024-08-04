@@ -1,0 +1,65 @@
+import keyboard
+from time import strftime
+from tkinter import *
+from tkinter import messagebox
+import datetime
+
+with open(r'D:\python\PycharmProjects\pythonProject2\play\程序\学习工具\累计工作时间.txt', 'r') as file:
+    for line in file:
+        总工作时间 = int(line.strip())
+星期 = datetime.datetime.today().weekday()
+if 星期 == 0:
+    总工作时间 = 0 - (48 * 3600 - 总工作时间)
+每日工作时间 = (48 * 3600 - 总工作时间) / (7 - 星期) / 3600
+messagebox.showinfo("每日工作时间", 每日工作时间)
+with open(r'D:\python\PycharmProjects\pythonProject2\play\程序\学习工具\累计工作时间.txt', 'w') as file:
+    file.write(str(总工作时间))
+
+
+class 主窗口(object):
+    def __init__(self, master):
+        self.master = master
+
+        self.标签 = Label(master, text="     时长记录     ", font="Calibri 20")
+        self.标签.grid(column=0, row=0, columnspan=1)
+
+        self.开始计时 = Button(master, text="开始计时", command=self.开始计时, font="Calibri 16")
+        self.开始计时.grid(column=0, row=1, sticky=W + E)
+
+        self.暂停计时 = Button(master, text="暂停计时", command=self.暂停计时, font="Calibri 16")
+        self.暂停计时.grid(column=0, row=2, sticky=W + E)
+
+        self.隐藏窗口 = Button(master, text="隐藏窗口", command=self.隐藏窗口, font="Calibri 16")
+        self.隐藏窗口.grid(column=0, row=3, sticky=W + E)
+    def 开始计时(self):
+        t = datetime.datetime.strptime(strftime('%H:%M:%S'), '%H:%M:%S')
+        当前时间 = t.hour * 3600 + t.minute * 60 + t.second
+        with open(r'D:\python\PycharmProjects\pythonProject2\play\程序\学习工具\暂存开始时间.txt', 'w') as file:
+            file.write(str(当前时间))
+
+    def 暂停计时(self):
+        with open(r'D:\python\PycharmProjects\pythonProject2\play\程序\学习工具\暂存开始时间.txt', 'r') as file:
+            for line in file:
+                暂存开始时间 = int(line.strip())
+        with open(r'D:\python\PycharmProjects\pythonProject2\play\程序\学习工具\累计工作时间.txt', 'r') as file:
+            for line in file:
+                先前工作时间 = int(line.strip())
+        t = datetime.datetime.strptime(strftime('%H:%M:%S'), '%H:%M:%S')
+        暂停时间 = t.hour * 3600 + t.minute * 60 + t.second
+        时间间隔 = 暂停时间 - 暂存开始时间
+        messagebox.showinfo("暂停时间：", 时间间隔)
+        累计工作时间 = 时间间隔 + 先前工作时间
+        with open(r'D:\python\PycharmProjects\pythonProject2\play\程序\学习工具\累计工作时间.txt', 'w') as file:
+            file.write(str(累计工作时间))
+    def 隐藏窗口(self):
+        root.withdraw()
+
+
+    keyboard.on_press_key("Scroll Lock", 开始计时)
+    keyboard.on_press_key("Pause Break", 暂停计时)
+
+if __name__ == "__main__":
+    root = Tk()
+    m = 主窗口(root)
+    root.mainloop()
+
